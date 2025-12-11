@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -29,19 +28,6 @@ interface IssuerListProps {
 
 export function IssuerList({ issuers, onEdit, onDelete, onView, isLoading }: IssuerListProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null)
-
-  const getStatusColor = (status?: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800 border-green-200"
-      case "inactive":
-        return "bg-gray-100 text-gray-800 border-gray-200"
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200"
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200"
-    }
-  }
 
   const handleDelete = (did: string) => {
     onDelete(did)

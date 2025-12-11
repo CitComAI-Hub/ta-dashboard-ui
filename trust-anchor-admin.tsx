@@ -3,9 +3,8 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Plus, Shield, Globe, Users, Activity, LogOut } from "lucide-react"
+import { Plus, Shield, Users, Activity, LogOut, Clock } from "lucide-react"
 import type { TrustedIssuer } from "./types/issuer"
 import { apiService } from "./services/api"
 import { logout } from "./services/auth"
@@ -51,8 +50,6 @@ function DashboardContent() {
 
   // Cuadros resumen
   const totalIssuers = issuers.length
-  const allCredentials = issuers.flatMap(i => i.credentialsSupported || [])
-  const credentialTypes = Array.from(new Set(allCredentials.map(c => c.type))).filter(Boolean)
   const lastUpdated = issuers
     .map(i => i.updatedAt)
     .filter(Boolean)
@@ -95,20 +92,22 @@ function DashboardContent() {
     }
   }
 
-  const handleFormSubmit = async (issuerData: Omit<TrustedIssuer, "id">) => {
+  const handleFormSubmit = async (issuerData: Omit<TrustedIssuer, "id"> & { id?: string }) => {
     setIsSubmitting(true)
-    const response = await apiService.createTrustedIssuer(issuerData)
+    const response = editingIssuer
+      ? await apiService.updateTrustedIssuer(editingIssuer.did, issuerData)
+      : await apiService.createTrustedIssuer(issuerData)
     if (response.error) {
       addNotification({
         type: "error",
-        title: `Create failed`,
+        title: editingIssuer ? "Update failed" : "Create failed",
         message: response.error,
       })
     } else {
       addNotification({
         type: "success",
-        title: `Issuer created`,
-        message: "The issuer was created successfully."
+        title: editingIssuer ? "Issuer updated" : "Issuer created",
+        message: editingIssuer ? "The issuer was updated successfully." : "The issuer was created successfully."
       })
       setIsFormOpen(false)
       setEditingIssuer(undefined)
@@ -121,9 +120,6 @@ function DashboardContent() {
     setIsFormOpen(false)
     setEditingIssuer(undefined)
   }
-
-  const activeIssuers = issuers.filter((i) => i.status === "active").length
-  const pendingIssuers = issuers.filter((i) => i.status === "pending").length
 
   const handleLogout = () => {
     logout()
@@ -152,7 +148,7 @@ function DashboardContent() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -181,22 +177,10 @@ function DashboardContent() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Credential Types</p>
-                  <p className="text-2xl font-bold text-purple-600">{credentialTypes.length}</p>
-                </div>
-                <Shield className="h-8 w-8 text-purple-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
                   <p className="text-sm font-medium text-gray-600">Last Updated</p>
                   <p className="text-2xl font-bold text-gray-900">{lastUpdated !== 'N/A' ? new Date(lastUpdated).toLocaleDateString() : 'N/A'}</p>
                 </div>
-                <Globe className="h-8 w-8 text-gray-600" />
+                <Clock className="h-8 w-8 text-gray-600" />
               </div>
             </CardContent>
           </Card>

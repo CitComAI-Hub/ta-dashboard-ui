@@ -78,12 +78,19 @@ class ApiService {
     // Construir el payload correcto para el backend
     const payload = {
       did: issuer.did.trim(),
-      credentials: Array.isArray(issuer.credentialsSupported)
-        ? issuer.credentialsSupported.map(c => c.type)
-        : []
     };
     return this.request<TrustedIssuer>(ISSUER_API, {
       method: "POST",
+      body: JSON.stringify(payload),
+    })
+  }
+
+  async updateTrustedIssuer(originalDid: string, issuer: Omit<TrustedIssuer, "id">): Promise<ApiResponse<TrustedIssuer>> {
+    const payload = {
+      did: issuer.did.trim(),
+    }
+    return this.request<TrustedIssuer>(`${ISSUER_API}/${encodeURIComponent(originalDid)}`, {
+      method: "PUT",
       body: JSON.stringify(payload),
     })
   }
@@ -95,9 +102,10 @@ class ApiService {
     if (response.data && Array.isArray(response.data.items)) {
       const trustedIssuers = response.data.items.map((item: any) => ({
         did: item.did,
-        credentialsSupported: [],
-        name: '',
         id: item.did,
+        status: item.status,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
       }))
       return { data: trustedIssuers }
     } else if (response.error) {
