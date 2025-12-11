@@ -86,10 +86,12 @@ class ApiService {
   }
 
   async updateTrustedIssuer(originalDid: string, issuer: Omit<TrustedIssuer, "id">): Promise<ApiResponse<TrustedIssuer>> {
+    const trimmedDid = issuer.did?.trim()
+    const targetDid = trimmedDid && trimmedDid.length > 0 ? trimmedDid : originalDid.trim()
     const payload = {
-      did: issuer.did.trim(),
+      did: targetDid,
     }
-    return this.request<TrustedIssuer>(`${ISSUER_API}/${encodeURIComponent(originalDid)}`, {
+    return this.request<TrustedIssuer>(`${ISSUER_API}/${encodeURIComponent(targetDid)}`, {
       method: "PUT",
       body: JSON.stringify(payload),
     })
