@@ -1,5 +1,5 @@
 import type { TrustedIssuer, EBSIIssuer, ApiResponse } from "../types/issuer"
-import { getToken } from "./auth"
+import { getToken, logout } from "./auth"
 
 // Unificación de variables de entorno
 declare global {
@@ -49,6 +49,10 @@ class ApiService {
 
       // Si es error y hay body, intenta extraer mensaje amigable
       if (!response.ok) {
+        if (response.status === 401) {
+          logout()
+          return { error: "Session expired. Please log in again." }
+        }
         let errorMsg = `HTTP error! status: ${response.status}`
         try {
           const err = await response.json()

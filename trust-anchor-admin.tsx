@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Plus, Shield, Globe, Users, Activity } from "lucide-react"
+import { Plus, Shield, Globe, Users, Activity, LogOut } from "lucide-react"
 import type { TrustedIssuer } from "./types/issuer"
 import { apiService } from "./services/api"
+import { logout } from "./services/auth"
 import { NotificationProvider, useNotification } from "./components/notification"
 import { IssuerList } from "./components/issuer-list"
 import { IssuerForm } from "./components/issuer-form"
@@ -124,15 +125,30 @@ function DashboardContent() {
   const activeIssuers = issuers.filter((i) => i.status === "active").length
   const pendingIssuers = issuers.filter((i) => i.status === "pending").length
 
+  const handleLogout = () => {
+    logout()
+    addNotification({
+      type: "info",
+      title: "Logged out",
+      message: "Session cleared locally. Please log in again.",
+    })
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <Shield className="h-10 w-10 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Trust Anchor Administration</h1>
+        <div className="flex flex-col gap-4 mb-8 md:flex-row md:items-center md:justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Shield className="h-10 w-10 text-blue-600" />
+              <h1 className="text-3xl font-bold text-gray-900">Trust Anchor Administration</h1>
+            </div>
+            <p className="text-gray-600">Manage trusted issuers in your FIWARE Data Space ecosystem</p>
           </div>
-          <p className="text-gray-600">Manage trusted issuers in your FIWARE Data Space ecosystem</p>
+          <Button variant="outline" onClick={handleLogout} className="self-start md:self-auto">
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </Button>
         </div>
 
         {/* Stats Cards */}

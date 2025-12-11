@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, ReactNode } from "react";
-import { isAuthenticated } from "../services/auth";
+import { isAuthenticated, AUTH_CHANGE_EVENT } from "../services/auth";
 import LoginForm from "../components/LoginForm";
 
 export default function AuthGate({ children }: { children: ReactNode }) {
@@ -10,6 +10,12 @@ export default function AuthGate({ children }: { children: ReactNode }) {
   useEffect(() => {
     setAuthed(isAuthenticated());
     setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    const handler = () => setAuthed(isAuthenticated());
+    window.addEventListener(AUTH_CHANGE_EVENT, handler);
+    return () => window.removeEventListener(AUTH_CHANGE_EVENT, handler);
   }, []);
 
   if (loading) return null;
