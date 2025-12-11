@@ -1,18 +1,32 @@
 import type { TrustedIssuer, EBSIIssuer, ApiResponse } from "../types/issuer"
+import { getToken } from "./auth"
 
-const BASE_URL = ""; // vacío, porque será relativo
+// Unificación de variables de entorno
+declare global {
+  interface Window { env: any }
+}
+function getBaseUrl() {
+  if (typeof window !== "undefined" && window.env?.NEXT_PUBLIC_API_URL) {
+    return window.env.NEXT_PUBLIC_API_URL;
+  }
+  return "";
+}
 
 const ISSUER_API = "/api/issuer";
 const REGISTRY_API = "/api/v4/issuers";
 
 class ApiService {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+    const token = getToken();
+    const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
+    const headers = Object.assign(
+      { "Content-Type": "application/json" },
+      authHeader,
+      options.headers || {}
+    );
     try {
-      const response = await fetch(`${BASE_URL}${endpoint}`, {
-        headers: {
-          "Content-Type": "application/json",
-          ...options.headers,
-        },
+      const response = await fetch(`${getBaseUrl()}${endpoint}`, {
+        headers,
         ...options,
       })
 
@@ -72,7 +86,7 @@ class ApiService {
 
   // Trusted Issuers Registry API (listado público)
   async getEBSIIssuers(): Promise<ApiResponse<TrustedIssuer[]>> {
-    // Llama a la API y extrae el array de items, adaptando a TrustedIssuer
+    // Llama al proxy del auth-backend para evitar CORS
     const response = await this.request<any>(REGISTRY_API, { method: "GET" })
     if (response.data && Array.isArray(response.data.items)) {
       const trustedIssuers = response.data.items.map((item: any) => ({

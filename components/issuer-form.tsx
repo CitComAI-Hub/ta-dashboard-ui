@@ -70,9 +70,9 @@ export function IssuerForm({ issuer, onSubmit, onCancel, isLoading }: IssuerForm
 
   return (
     <Card className="w-full max-w-2xl">
-      {/* <CardHeader>
-        <CardTitle>{issuer ? "Edit Trusted Issuer" : "Add New Trusted Issuer"}</CardTitle>
-      </CardHeader> */}
+      <CardHeader>
+        {/* <CardTitle>{issuer ? "Edit Trusted Issuer" : "Add New Trusted Issuer"}</CardTitle> */}
+      </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">

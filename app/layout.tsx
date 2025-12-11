@@ -1,20 +1,17 @@
-import type { Metadata } from 'next'
-import './globals.css'
+import Script from "next/script";
+import "./globals.css";
+import AuthGate from "./AuthGate";
+import type { ReactNode } from "react";
 
-export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.dev',
-}
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <head>
+        <Script src="/env.js" strategy="beforeInteractive" />
+      </head>
+      <body>
+        <AuthGate>{children}</AuthGate>
+      </body>
     </html>
-  )
+  );
 }

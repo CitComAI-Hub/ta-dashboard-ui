@@ -10,10 +10,7 @@ const nextConfig = {
     unoptimized: true,
   },
   output: 'export',
-  env: {
-    NEXT_PUBLIC_TIL_API_URL: process.env.NEXT_PUBLIC_TIL_API_URL,
-    NEXT_PUBLIC_TIR_API_URL: process.env.NEXT_PUBLIC_TIR_API_URL,
-  },
+  // Ya no es necesario el bloque env, las variables se inyectan en runtime
 }
 
 export default nextConfig
